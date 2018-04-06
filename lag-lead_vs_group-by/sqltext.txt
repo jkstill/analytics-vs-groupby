@@ -1,0 +1,1 @@
+select '/u01/app/oracle/diag/rdbms/oravm/oravm1/trace/oravm1_ora_10163_S1.trc' scp_filename from dual

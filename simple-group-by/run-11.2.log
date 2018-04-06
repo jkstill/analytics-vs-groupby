@@ -1,0 +1,700 @@
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 18:11:46 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s1.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales - simple Group By
+
+  1  select count(*) from (
+  2  	select prod_id,channel_id,  count(*) prod_count
+  3  	from sh.sales
+  4  	group by prod_id, channel_id
+  5* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:04.87
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.05
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  g9sq072xs88yy, child number 0
+-------------------------------------
+select count(*) from (  select prod_id,channel_id,  count(*) prod_count
+ from sh.sales  group by prod_id, channel_id )
+
+Plan hash value: 4070617528
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation              | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |       |      1 |        |       |   288 (100)|          |       |       |      1 |00:00:04.43 |    1635 |   1635 |       |       |          |
+|   1 |  SORT AGGREGATE        |       |      1 |      1 |       |            |          |       |       |      1 |00:00:04.43 |    1635 |   1635 |       |       |          |
+|   2 |   VIEW                 |       |      1 |    204 |       |   288   (5)| 00:00:01 |       |       |    228 |00:00:04.43 |    1635 |   1635 |       |       |          |
+|   3 |    HASH GROUP BY       |       |      1 |    204 |  1428 |   288   (5)| 00:00:01 |       |       |    228 |00:00:04.43 |    1635 |   1635 |  1049K|  1049K| 2679K (0)|
+|   4 |     PARTITION RANGE ALL|       |      1 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:03.40 |    1635 |   1635 |       |       |          |
+|   5 |      TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:01.51 |    1635 |   1635 |       |       |          |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   5 - SEL$2 / SALES@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+   4 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+   5 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+
+
+34 rows selected.
+
+Elapsed: 00:00:00.35
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'asynch descriptor resize'
+	'db file scattered read'
+	'db file sequential read'
+	'row cache lock'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        3.454475   81.2%      2  1.727237  0.000000  3.454475
+db file scattered read       0.436087   10.3%     16  0.027255  0.007180  0.127932
+db file sequential read      0.219391    5.2%     96  0.002285  0.000128  0.023023
+PARSE                        0.135979    3.2%      2  0.067989  0.000000  0.135979
+SQL*Net message from client  0.004453    0.1%      3  0.001484  0.000530  0.003206
+row cache lock               0.004051    0.1%     34  0.000119  0.000003  0.000322
+SQL*Net message to client    0.000005    0.0%      3  0.000002  0.000001  0.000003
+Disk file operations I/O     0.000003    0.0%      1  0.000003  0.000003  0.000003
+asynch descriptor resize     0.000003    0.0%      1  0.000003  0.000003  0.000003
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (11)                   4.254447  100.0%    162  0.026262  0.000000  3.454475
+
+SQL> SQL> SQL> Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.2.0 - 64bit Production
+With the Partitioning, Real Application Clusters, Automatic Storage Management, OLAP,
+Data Mining and Real Application Testing options
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 18:11:55 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s2.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales - count() Analytic Function
+
+  1  select count(*)
+  2  from (
+  3  	select distinct prod_id
+  4  		, max(channel_id) over (partition by prod_id) channel_id
+  5  		, count(*) over (partition by prod_id, channel_id) prod_count
+  6  	from sh.sales
+  7* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:07.03
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.04
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  1as742ugsuu8d, child number 0
+-------------------------------------
+select count(*) from (  select distinct prod_id   , max(channel_id)
+over (partition by prod_id) channel_id   , count(*) over (partition by
+prod_id, channel_id) prod_count  from sh.sales )
+
+Plan hash value: 2285947986
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation               | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT        |       |      1 |        |       |  2907 (100)|          |       |       |      1 |00:00:06.52 |    1635 |   1635 |       |       |          |
+|   1 |  SORT AGGREGATE         |       |      1 |      1 |       |            |          |       |       |      1 |00:00:06.52 |    1635 |   1635 |       |       |          |
+|   2 |   VIEW                  |       |      1 |    204 |       |  2907   (1)| 00:00:02 |       |       |    228 |00:00:06.52 |    1635 |   1635 |       |       |          |
+|   3 |    HASH UNIQUE          |       |      1 |    204 |  1428 |  2907   (1)| 00:00:02 |       |       |    228 |00:00:06.52 |    1635 |   1635 |  1115K|  1115K| 1339K (0)|
+|   4 |     WINDOW SORT         |       |      1 |    204 |  1428 |  2907   (1)| 00:00:02 |       |       |    918K|00:00:05.45 |    1635 |   1635 |    23M|  1770K|   20M (0)|
+|   5 |      PARTITION RANGE ALL|       |      1 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:03.08 |    1635 |   1635 |       |       |          |
+|   6 |       TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:01.17 |    1635 |   1635 |       |       |          |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   6 - SEL$2 / SALES@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - "PROD_ID"[NUMBER,22], MAX("CHANNEL_ID") OVER ( PARTITION BY "PROD_ID")[22], COUNT(*) OVER ( PARTITION BY "PROD_ID","CHANNEL_ID")[22]
+   4 - (#keys=2) "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "PROD_ID","CHANNEL_ID")[22], MAX("CHANNEL_ID") OVER ( PARTITION BY
+       "PROD_ID")[22]
+   5 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+   6 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+
+
+38 rows selected.
+
+Elapsed: 00:00:00.34
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'asynch descriptor resize'
+	'db file scattered read'
+	'db file sequential read'
+	'row cache lock'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        5.645142   91.3%      2  2.822571  0.000000  5.645142
+PARSE                        0.248962    4.0%      2  0.124481  0.000000  0.248962
+db file sequential read      0.161196    2.6%    202  0.000798  0.000083  0.032856
+db file scattered read       0.121280    2.0%     16  0.007580  0.004985  0.009587
+row cache lock               0.007253    0.1%     49  0.000148  0.000003  0.000642
+SQL*Net message from client  0.001891    0.0%      3  0.000630  0.000527  0.000806
+SQL*Net message to client    0.000005    0.0%      3  0.000002  0.000001  0.000002
+Disk file operations I/O     0.000003    0.0%      1  0.000003  0.000003  0.000003
+asynch descriptor resize     0.000003    0.0%      1  0.000003  0.000003  0.000003
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (11)                   6.185735  100.0%    283  0.021858  0.000000  5.645142
+
+SQL> SQL> SQL> Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.2.0 - 64bit Production
+With the Partitioning, Real Application Clusters, Automatic Storage Management, OLAP,
+Data Mining and Real Application Testing options
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 18:12:04 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s3.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales with prod_count_total - simple Group By with Scalar Subquery
+
+  1  select count(*) from  (
+  2  select  s.prod_id
+  3  	, s.channel_id
+  4  	, count(*) prod_count_per_channel
+  5  	, (select /*+ no_push_pred no_merge */ count(*)  from sh.sales where prod_id = s.prod_id) prod_count_total
+  6  from sh.sales s
+  7  group by s.prod_id, s.channel_id
+  8  order by prod_id, channel_id
+  9* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:04.89
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.01
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  4wgbwqwupw2rq, child number 0
+-------------------------------------
+select count(*) from  ( select  s.prod_id  , s.channel_id  , count(*)
+prod_count_per_channel  , (select /*+ no_push_pred no_merge */ count(*)
+ from sh.sales where prod_id = s.prod_id) prod_count_total from
+sh.sales s group by s.prod_id, s.channel_id order by prod_id,
+channel_id )
+
+Plan hash value: 4070617528
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation              | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |       |      1 |        |       |   288 (100)|          |       |       |      1 |00:00:04.28 |    1635 |   1635 |       |       |          |
+|   1 |  SORT AGGREGATE        |       |      1 |      1 |       |            |          |       |       |      1 |00:00:04.28 |    1635 |   1635 |       |       |          |
+|   2 |   VIEW                 |       |      1 |    204 |       |   288   (5)| 00:00:01 |       |       |    228 |00:00:04.28 |    1635 |   1635 |       |       |          |
+|   3 |    HASH GROUP BY       |       |      1 |    204 |  1428 |   288   (5)| 00:00:01 |       |       |    228 |00:00:04.28 |    1635 |   1635 |  1049K|  1049K| 2667K (0)|
+|   4 |     PARTITION RANGE ALL|       |      1 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:03.21 |    1635 |   1635 |       |       |          |
+|   5 |      TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:01.25 |    1635 |   1635 |       |       |          |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$73523A42 / from$_subquery$_001@SEL$1
+   3 - SEL$73523A42
+   5 - SEL$73523A42 / S@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+   4 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+   5 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+37 rows selected.
+
+Elapsed: 00:00:00.22
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'asynch descriptor resize'
+	'db file scattered read'
+	'db file sequential read'
+	'latch: row cache objects'
+	'row cache lock'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        3.489469   88.0%      2  1.744735  0.000000  3.489469
+PARSE                        0.240963    6.1%      2  0.120482  0.000000  0.240963
+db file scattered read       0.125709    3.2%     16  0.007857  0.006093  0.008943
+db file sequential read      0.069141    1.7%    153  0.000452  0.000126  0.001850
+row cache lock               0.037053    0.9%     93  0.000398  0.000002  0.010365
+SQL*Net message from client  0.001508    0.0%      3  0.000503  0.000465  0.000529
+CLOSE                        0.001000    0.0%      2  0.000500  0.000000  0.001000
+SQL*Net message to client    0.000136    0.0%      3  0.000045  0.000001  0.000133
+latch: row cache objects     0.000069    0.0%      1  0.000069  0.000069  0.000069
+Disk file operations I/O     0.000003    0.0%      1  0.000003  0.000003  0.000003
+asynch descriptor resize     0.000001    0.0%      1  0.000001  0.000001  0.000001
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (12)                   3.965052  100.0%    279  0.014212  0.000000  3.489469
+
+SQL> SQL> SQL> Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.2.0 - 64bit Production
+With the Partitioning, Real Application Clusters, Automatic Storage Management, OLAP,
+Data Mining and Real Application Testing options
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 18:12:10 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s3a.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.02
+SQL> 
+count of Sales with prod_count_total - via Group By and join
+
+  1  select count(*) from  (
+  2  select  s.prod_id
+  3  	, s.channel_id
+  4  	, count(*) prod_count_per_channel
+  5  	, t.prod_count_total
+  6  from
+  7  (
+  8  	select prod_id
+  9  		, count(*) prod_count_total
+ 10  	from sh.sales
+ 11  	group by prod_id
+ 12  ) t
+ 13  join sh.sales s on t.prod_id = s.prod_id
+ 14  group by s.prod_id, s.channel_id, t.prod_count_total
+ 15  order by prod_id, channel_id
+ 16* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:04.43
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.04
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  4mr08nrku6qhh, child number 0
+-------------------------------------
+select count(*) from  ( select  s.prod_id  , s.channel_id  , count(*)
+prod_count_per_channel  , t.prod_count_total from (  select prod_id   ,
+count(*) prod_count_total  from sh.sales  group by prod_id ) t join
+sh.sales s on t.prod_id = s.prod_id group by s.prod_id, s.channel_id,
+t.prod_count_total order by prod_id, channel_id )
+
+Plan hash value: 1854003783
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name           | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                |      1 |        |       |   329 (100)|          |       |       |      1 |00:00:03.99 |    1715 |   1699 |       |       |          |
+|   1 |  SORT AGGREGATE                     |                |      1 |      1 |       |            |          |       |       |      1 |00:00:03.99 |    1715 |   1699 |       |       |          |
+|   2 |   VIEW                              |                |      1 |    204 |       |   329   (8)| 00:00:01 |       |       |    228 |00:00:03.99 |    1715 |   1699 |       |       |          |
+|   3 |    HASH GROUP BY                    |                |      1 |    204 |  7548 |   329   (8)| 00:00:01 |       |       |    228 |00:00:03.99 |    1715 |   1699 |   885K|   885K| 1347K (0)|
+|*  4 |     HASH JOIN                       |                |      1 |    249 |  9213 |   328   (8)| 00:00:01 |       |       |    228 |00:00:03.99 |    1715 |   1699 |  1236K|  1236K| 1286K (0)|
+|   5 |      VIEW                           |                |      1 |     72 |  1224 |    40  (28)| 00:00:01 |       |       |     72 |00:00:00.02 |      80 |     64 |       |       |          |
+|   6 |       HASH GROUP BY                 |                |      1 |     72 |   288 |    40  (28)| 00:00:01 |       |       |     72 |00:00:00.02 |      80 |     64 |  1115K|  1115K| 2670K (0)|
+|   7 |        PARTITION RANGE ALL          |                |      1 |    918K|  3589K|    29   (0)| 00:00:01 |     1 |    28 |   1074 |00:00:00.02 |      80 |     64 |       |       |          |
+|   8 |         BITMAP CONVERSION COUNT     |                |     28 |    918K|  3589K|    29   (0)| 00:00:01 |       |       |   1074 |00:00:00.02 |      80 |     64 |       |       |          |
+|   9 |          BITMAP INDEX FAST FULL SCAN| SALES_PROD_BIX |     28 |        |       |            |          |     1 |    28 |   1074 |00:00:00.02 |      80 |     64 |       |       |          |
+|  10 |      VIEW                           | VW_GBF_10      |      1 |    204 |  4080 |   288   (5)| 00:00:01 |       |       |    228 |00:00:03.96 |    1635 |   1635 |       |       |          |
+|  11 |       HASH GROUP BY                 |                |      1 |    204 |  1428 |   288   (5)| 00:00:01 |       |       |    228 |00:00:03.96 |    1635 |   1635 |  1049K|  1049K| 2667K (0)|
+|  12 |        PARTITION RANGE ALL          |                |      1 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:02.97 |    1635 |   1635 |       |       |          |
+|  13 |         TABLE ACCESS FULL           | SALES          |     28 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:01.14 |    1635 |   1635 |       |       |          |
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$0E70E431 / from$_subquery$_001@SEL$1
+   3 - SEL$0E70E431
+   5 - SEL$3        / T@SEL$2
+   6 - SEL$3
+   8 - SEL$3        / SALES@SEL$3
+  10 - SEL$C73A2042 / VW_GBF_10@SEL$4A27C112
+  11 - SEL$C73A2042
+  13 - SEL$C73A2042 / S@SEL$2
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   4 - access("T"."PROD_ID"="ITEM_1")
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - "ITEM_1"[NUMBER,22], "ITEM_3"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22], SUM("ITEM_2")[22]
+   4 - (#keys=1) "ITEM_1"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22], "ITEM_3"[NUMBER,22], "ITEM_2"[NUMBER,22]
+   5 - "T"."PROD_ID"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22]
+   6 - "PROD_ID"[NUMBER,22], COUNT(*)[22]
+   7 - COUNT(*)[22], "PROD_ID"[NUMBER,22]
+   8 - COUNT(*)[22], "PROD_ID"[NUMBER,22]
+   9 - STRDEF[BM VAR, 10], STRDEF[BM VAR, 10], STRDEF[BM VAR, 7920], "PROD_ID"[NUMBER,22]
+  10 - "ITEM_1"[NUMBER,22], "ITEM_2"[NUMBER,22], "ITEM_3"[NUMBER,22]
+  11 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+  12 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+  13 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+63 rows selected.
+
+Elapsed: 00:00:00.31
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'asynch descriptor resize'
+	'db file scattered read'
+	'db file sequential read'
+	'row cache lock'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        3.443476   87.9%      2  1.721738  0.000000  3.443476
+PARSE                        0.248962    6.4%      2  0.124481  0.000000  0.248962
+db file scattered read       0.130644    3.3%     32  0.004083  0.000124  0.009163
+db file sequential read      0.078988    2.0%    186  0.000425  0.000101  0.002160
+row cache lock               0.011831    0.3%     94  0.000126  0.000002  0.000527
+SQL*Net message from client  0.001550    0.0%      3  0.000517  0.000391  0.000732
+asynch descriptor resize     0.000042    0.0%      7  0.000006  0.000001  0.000032
+SQL*Net message to client    0.000004    0.0%      3  0.000001  0.000001  0.000002
+Disk file operations I/O     0.000002    0.0%      1  0.000002  0.000002  0.000002
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (11)                   3.915499  100.0%    334  0.011723  0.000000  3.443476
+
+SQL> SQL> SQL> Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.2.0 - 64bit Production
+With the Partitioning, Real Application Clusters, Automatic Storage Management, OLAP,
+Data Mining and Real Application Testing options
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 18:12:19 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s4.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+count of Sales with prod_count_total - via count() Analytic Function
+
+  1  select count(*) from  (
+  2  select  distinct
+  3  	s.prod_id
+  4  	, s.channel_id
+  5  	, count(*) over (partition by s.prod_id, s.channel_id) prod_count_per_channel
+  6  	, count(*) over (partition by s.prod_id) prod_count_total
+  7  from sh.sales s
+  8  --group by s.prod_id, s.channel_id
+  9  order by prod_id, channel_id
+ 10* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:07.14
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.04
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  bwdcpvtu5kpb7, child number 0
+-------------------------------------
+select count(*) from  ( select  distinct  s.prod_id  , s.channel_id  ,
+count(*) over (partition by s.prod_id, s.channel_id)
+prod_count_per_channel  , count(*) over (partition by s.prod_id)
+prod_count_total from sh.sales s --group by s.prod_id, s.channel_id
+order by prod_id, channel_id )
+
+Plan hash value: 197557324
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation               | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT        |       |      1 |        |       |   288 (100)|          |       |       |      1 |00:00:06.48 |    1635 |   1635 |       |       |          |
+|   1 |  SORT AGGREGATE         |       |      1 |      1 |       |            |          |       |       |      1 |00:00:06.48 |    1635 |   1635 |       |       |          |
+|   2 |   VIEW                  |       |      1 |    204 |       |   288   (5)| 00:00:01 |       |       |    228 |00:00:06.48 |    1635 |   1635 |       |       |          |
+|   3 |    SORT UNIQUE          |       |      1 |    204 |  1428 |   277   (1)| 00:00:01 |       |       |    228 |00:00:06.48 |    1635 |   1635 | 15360 | 15360 |14336  (0)|
+|   4 |     WINDOW SORT         |       |      1 |    204 |  1428 |   288   (5)| 00:00:01 |       |       |    918K|00:00:05.38 |    1635 |   1635 |    23M|  1770K|   20M (0)|
+|   5 |      PARTITION RANGE ALL|       |      1 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:03.01 |    1635 |   1635 |       |       |          |
+|   6 |       TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   277   (1)| 00:00:01 |     1 |    28 |    918K|00:00:01.16 |    1635 |   1635 |       |       |          |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   6 - SEL$2 / S@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - (#keys=4) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "S"."PROD_ID","S"."CHANNEL_ID")[22], COUNT(*) OVER ( PARTITION BY
+       "S"."PROD_ID")[22]
+   4 - (#keys=2) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "S"."PROD_ID")[22], COUNT(*) OVER ( PARTITION BY
+       "S"."PROD_ID","S"."CHANNEL_ID")[22]
+   5 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+   6 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+41 rows selected.
+
+Elapsed: 00:00:00.27
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'row cache lock'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        5.722129   91.6%      2  2.861064  0.000000  5.722129
+PARSE                        0.257961    4.1%      2  0.128980  0.000000  0.257961
+db file scattered read       0.124987    2.0%     16  0.007812  0.005118  0.012848
+db file sequential read      0.121458    1.9%    175  0.000694  0.000150  0.026106
+row cache lock               0.016329    0.3%     69  0.000237  0.000002  0.003228
+SQL*Net message from client  0.001268    0.0%      3  0.000423  0.000403  0.000442
+SQL*Net message to client    0.000005    0.0%      3  0.000002  0.000001  0.000002
+Disk file operations I/O     0.000002    0.0%      1  0.000002  0.000002  0.000002
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (10)                   6.244139  100.0%    275  0.022706  0.000000  5.722129
+
+SQL> SQL> SQL> Disconnected from Oracle Database 11g Enterprise Edition Release 11.2.0.2.0 - 64bit Production
+With the Partitioning, Real Application Clusters, Automatic Storage Management, OLAP,
+Data Mining and Real Application Testing options

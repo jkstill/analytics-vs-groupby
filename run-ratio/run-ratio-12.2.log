@@ -1,0 +1,489 @@
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:54:35 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ h1.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+report generated with ratio_to_report()
+
+  1  with data as (
+  2  	select distinct
+  3  		region_id
+  4  		, dept_id
+  5  		, product_id
+  6  		, emp_id
+  7  		, sum(qty) over (partition by region_id, dept_id, product_id, emp_id) emp_qty_sold
+  8  		, sum(qty) over (partition by region_id, product_id) region_prod_total
+  9  	from af_test
+ 10  )
+ 11  select count(*)
+ 12  from (
+ 13  	select
+ 14  		region_id
+ 15  		, dept_id
+ 16  		, product_id
+ 17  		, emp_id
+ 18  		, emp_qty_sold
+ 19  		, region_prod_total
+ 20  		, ratio_to_report(emp_qty_sold) over (partition by region_id, product_id) ratio2rpt
+ 21  	from data
+ 22  	order by 7,4,2
+ 23* )
+
+  COUNT(*)
+----------
+     10692
+
+1 row selected.
+
+Elapsed: 00:00:11.60
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.05
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  1d4hggu4a0k8w, child number 0
+-------------------------------------
+with data as (  select distinct   region_id   , dept_id   , product_id
+ , emp_id   , sum(qty) over (partition by region_id, dept_id,
+product_id, emp_id) emp_qty_sold   , sum(qty) over (partition by
+region_id, product_id) region_prod_total  from af_test ) select
+count(*) from (  select   region_id   , dept_id   , product_id   ,
+emp_id   , emp_qty_sold   , region_prod_total   ,
+ratio_to_report(emp_qty_sold) over (partition by region_id, product_id)
+ratio2rpt  from data  order by 7,4,2 )
+
+Plan hash value: 3171444235
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                | Name    | Starts | E-Rows |E-Bytes|E-Temp | Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  | Writes |  OMem |  1Mem | Used-Mem | Used-Tmp|
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT         |         |      1 |        |       |       | 14948 (100)|          |      1 |00:00:11.53 |    3271 |  10161 |   6922 |       |       |          |         |
+|   1 |  SORT AGGREGATE          |         |      1 |      1 |       |       |            |          |      1 |00:00:11.53 |    3271 |  10161 |   6922 |       |       |          |         |
+|   2 |   VIEW                   |         |      1 |    264K|       |       | 14948   (5)| 00:00:01 |  10692 |00:00:11.53 |    3271 |  10161 |   6922 |       |       |          |         |
+|   3 |    SORT ORDER BY         |         |      1 |    264K|    14M|    19M| 14948   (5)| 00:00:01 |  10692 |00:00:11.53 |    3271 |  10161 |   6922 |   690K|   486K|  613K (0)|         |
+|   4 |     WINDOW SORT          |         |      1 |    264K|    14M|    19M| 14948   (5)| 00:00:01 |  10692 |00:00:11.53 |    3271 |  10161 |   6922 |   619K|   472K|  550K (0)|         |
+|   5 |      VIEW                |         |      1 |    264K|    14M|       |  8180   (7)| 00:00:01 |  10692 |00:00:11.52 |    3271 |  10161 |   6922 |       |       |          |         |
+|   6 |       HASH UNIQUE        |         |      1 |    264K|  4651K|    30M|  8180   (7)| 00:00:01 |  10692 |00:00:11.52 |    3271 |  10161 |   6922 |  1679K|  1581K| 6781K (0)|         |
+|   7 |        WINDOW SORT       |         |      1 |    264K|  4651K|    30M|  8180   (7)| 00:00:01 |   1000K|00:00:11.26 |    3271 |  10161 |   6922 |    30M|  1989K|   25M (1)|   28672 |
+|   8 |         TABLE ACCESS FULL| AF_TEST |      1 |   1000K|    17M|       |   379  (18)| 00:00:01 |   1000K|00:00:00.83 |    3266 |   3239 |      0 |       |       |          |         |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$2
+   2 - SEL$3 / from$_subquery$_002@SEL$2
+   3 - SEL$3
+   5 - SEL$1 / DATA@SEL$3
+   6 - SEL$1
+   8 - SEL$1 / AF_TEST@SEL$1
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - (#keys=3) "EMP_QTY_SOLD"/DECODE(SUM("EMP_QTY_SOLD") OVER ( PARTITION BY "REGION_ID","PRODUCT_ID"),0,NULL,SUM("EMP_QTY_SOLD") OVER ( PARTITION BY
+       "REGION_ID","PRODUCT_ID"))[22], "EMP_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22]
+   4 - (#keys=2) "REGION_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "REGION_PROD_TOTAL"[NUMBER,22], "DEPT_ID"[NUMBER,22], "EMP_QTY_SOLD"[NUMBER,22], "EMP_ID"[NUMBER,22],
+       SUM("EMP_QTY_SOLD") OVER ( PARTITION BY "REGION_ID","PRODUCT_ID")[22]
+   5 - "REGION_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22], "EMP_QTY_SOLD"[NUMBER,22], "REGION_PROD_TOTAL"[NUMBER,22]
+   6 - "REGION_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22], SUM("QTY") OVER ( PARTITION BY "REGION_ID","PRODUCT_ID","DEPT_ID","EMP_ID")[22],
+       SUM("QTY") OVER ( PARTITION BY "REGION_ID","PRODUCT_ID")[22]
+   7 - (#keys=4) "REGION_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22], "QTY"[NUMBER,22], SUM("QTY") OVER ( PARTITION BY
+       "REGION_ID","PRODUCT_ID")[22], SUM("QTY") OVER ( PARTITION BY "REGION_ID","PRODUCT_ID","DEPT_ID","EMP_ID")[22]
+   8 - "REGION_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "QTY"[NUMBER,22]
+
+
+52 rows selected.
+
+Elapsed: 00:00:00.86
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'CSS initialization'
+	'CSS operation: action'
+	'CSS operation: query'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'direct path read temp'
+	'direct path write temp'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+	'library cache lock'
+	'library cache pin'
+
+CALL-NAME                     DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  ---------  ------  -----  --------  --------  --------
+direct path write temp        4.219526   37.0%     67  0.062978  0.008442  0.293814
+acknowledge over PGA limit    2.380231   20.9%    248  0.009598  0.000005  0.026927
+direct path read temp         2.257986   19.8%    597  0.003782  0.000007  0.121059
+FETCH                         1.736000   15.2%      2  0.868000  0.000000  1.736000
+db file scattered read        0.675641    5.9%     41  0.016479  0.000628  0.118200
+db file sequential read       0.034651    0.3%     24  0.001444  0.000072  0.016151
+gc cr multi block grant       0.031995    0.3%     52  0.000615  0.000116  0.001543
+PARSE                         0.026000    0.2%      2  0.013000  0.000000  0.026000
+PGA memory operation          0.012150    0.1%    707  0.000017  0.000000  0.000809
+CSS initialization            0.008893    0.1%      2  0.004446  0.000027  0.008866
+gc cr grant 2-way             0.003468    0.0%     15  0.000231  0.000003  0.000476
+SQL*Net message from client   0.002986    0.0%      3  0.000995  0.000349  0.002253
+CSS operation: action         0.001035    0.0%      2  0.000517  0.000488  0.000547
+CSS operation: query          0.000535    0.0%      6  0.000089  0.000000  0.000525
+library cache pin             0.000533    0.0%      2  0.000267  0.000257  0.000276
+library cache lock            0.000473    0.0%      1  0.000473  0.000473  0.000473
+gc current grant 2-way        0.000300    0.0%      2  0.000150  0.000086  0.000214
+Disk file operations I/O      0.000011    0.0%      2  0.000005  0.000003  0.000008
+SQL*Net message to client     0.000004    0.0%      3  0.000001  0.000001  0.000002
+CLOSE                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                          0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  ---------  ------  -----  --------  --------  --------
+TOTAL (21)                   11.392418  100.0%  1,782  0.006393  0.000000  1.736000
+
+SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:54:50 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ h2.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.04
+SQL> 
+report generated vi Advanged Group By
+
+  1  with data as (
+  2  	select distinct
+  3  		region_id
+  4  		, dept_id
+  5  		, product_id
+  6  		, emp_id
+  7  		, sum(qty) qty_sold
+  8  	from af_test
+  9  	group by grouping sets(
+ 10  		rollup(
+ 11  			region_id
+ 12  			, dept_id
+ 13  			, product_id
+ 14  			, emp_id
+ 15  		),
+ 16  		rollup (
+ 17  			region_id
+ 18  			, product_id
+ 19  		)
+ 20  	)
+ 21  	having group_id() < 1
+ 22  ),
+ 23  prod_totals as (
+ 24  	select distinct
+ 25  		region_id
+ 26  		, product_id
+ 27  		, qty_sold
+ 28  	from data
+ 29  	where emp_id is null
+ 30  		and dept_id is null
+ 31  		and product_id is not null
+ 32  ),
+ 33  emp_totals as (
+ 34  	select
+ 35  		region_id
+ 36  		, dept_id
+ 37  		, product_id
+ 38  		, emp_id
+ 39  		, qty_sold
+ 40  	from data
+ 41  	where emp_id is  not null
+ 42  		and product_id is not null
+ 43  )
+ 44  select count(*) from (
+ 45  select
+ 46  	e.region_id
+ 47  	, e.dept_id
+ 48  	, e.product_id
+ 49  	, e.emp_id
+ 50  	, e.qty_sold emp_qty_sold
+ 51  	, p.qty_sold as region_prod_qty
+ 52  	, e.qty_sold / p.qty_sold as ratio2rpt
+ 53  from emp_totals e
+ 54  join prod_totals p on p.region_id = e.region_id
+ 55  	and p.product_id = e.product_id
+ 56  --order by 1,2,3,4,5,6
+ 57  order by 7,4,2
+ 58* )
+
+  COUNT(*)
+----------
+     10692
+
+1 row selected.
+
+Elapsed: 00:00:20.75
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.27
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  8xvuwt07bwmhx, child number 1
+-------------------------------------
+with data as (  select distinct   region_id   , dept_id   , product_id
+ , emp_id   , sum(qty) qty_sold  from af_test  group by grouping sets(
+ rollup(    region_id    , dept_id    , product_id    , emp_id   ),
+rollup (    region_id    , product_id   )  )  having group_id() < 1 ),
+prod_totals as (  select distinct   region_id   , product_id   ,
+qty_sold  from data  where emp_id is null   and dept_id is null   and
+product_id is not null ), emp_totals as (  select   region_id   ,
+dept_id   , product_id   , emp_id   , qty_sold  from data  where emp_id
+is  not null   and product_id is not null ) select count(*) from (
+select  e.region_id  , e.dept_id  , e.product_id  , e.emp_id  ,
+e.qty_sold emp_qty_sold  , p.qty_sold as region_prod_qty  , e.qty_sold
+/ p.qty_sold as ratio2rpt from emp_totals e join prod_totals p on
+p.region_id = e.region_id  and p.product_id = e.product_id --order by
+1,2,3,4,5,6 order by 7,4,2 )
+
+Plan hash value: 3663754160
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                    | Name                       | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  | Writes |  OMem |  1Mem | Used-Mem |
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT             |                            |      1 |        |       |   627 (100)|          |      1 |00:00:15.76 |    3549 |   3320 |     79 |       |       |          |
+|   1 |  TEMP TABLE TRANSFORMATION   |                            |      1 |        |       |            |          |      1 |00:00:15.76 |    3549 |   3320 |     79 |       |       |          |
+|   2 |   LOAD AS SELECT             | SYS_TEMP_0FD9E0DFA_36070AA |      1 |        |       |            |          |      0 |00:00:15.67 |    3456 |   3284 |     79 |  1040K|  1040K|          |
+|   3 |    TEMP TABLE TRANSFORMATION |                            |      1 |        |       |            |          |  10843 |00:00:15.48 |    3416 |   3282 |     43 |       |       |          |
+|   4 |     MULTI-TABLE INSERT       |                            |      1 |        |       |            |          |      0 |00:00:14.72 |    3310 |   3239 |     40 |       |       |          |
+|   5 |      SORT GROUP BY ROLLUP    |                            |      1 |   3781 | 68058 |   605  (49)| 00:00:01 |  10827 |00:00:14.52 |    3266 |   3239 |      0 |   903K|   523K|  802K (0)|
+|   6 |       TABLE ACCESS FULL      | AF_TEST                    |      1 |   1000K|    17M|   379  (18)| 00:00:01 |   1000K|00:00:05.43 |    3266 |   3239 |      0 |       |       |          |
+|   7 |      DIRECT LOAD INTO        | SYS_TEMP_0FD9E0DFB_36070AA |      0 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|   8 |      DIRECT LOAD INTO        | SYS_TEMP_0FD9E0DFC_36070AA |      0 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|   9 |     MULTI-TABLE INSERT       |                            |      1 |        |       |            |          |      0 |00:00:00.16 |      19 |      1 |      3 |       |       |          |
+|  10 |      SORT GROUP BY ROLLUP    |                            |      1 |      9 |   162 |     5  (40)| 00:00:01 |     16 |00:00:00.01 |       9 |      1 |      0 |  2048 |  2048 | 2048  (0)|
+|  11 |       TABLE ACCESS FULL      | SYS_TEMP_0FD9E0DFB_36070AA |      1 |   3781 | 68058 |     3   (0)| 00:00:01 |    108 |00:00:00.01 |       9 |      1 |      0 |       |       |          |
+|  12 |      DIRECT LOAD INTO        | SYS_TEMP_0FD9E0DFD_36070AA |      0 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  13 |      DIRECT LOAD INTO        | SYS_TEMP_0FD9E0DFE_36070AA |      0 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  14 |      DIRECT LOAD INTO        | SYS_TEMP_0FD9E0DFC_36070AA |      0 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  15 |     HASH UNIQUE              |                            |      1 |   3781 |   103K|    13  (24)| 00:00:01 |  10843 |00:00:00.54 |      75 |     42 |      0 |  1626K|  1626K| 1410K (0)|
+|  16 |      VIEW                    |                            |      1 |   7582 |   207K|    11  (10)| 00:00:01 |  10843 |00:00:00.41 |      75 |     42 |      0 |       |       |          |
+|  17 |       VIEW                   |                            |      1 |   7582 |   481K|    11  (10)| 00:00:01 |  10843 |00:00:00.31 |      75 |     42 |      0 |       |       |          |
+|  18 |        UNION-ALL             |                            |      1 |        |       |            |          |  10843 |00:00:00.23 |      75 |     42 |      0 |       |       |          |
+|  19 |         TABLE ACCESS FULL    | SYS_TEMP_0FD9E0DFC_36070AA |      1 |   3781 | 68058 |     3   (0)| 00:00:01 |  10731 |00:00:00.06 |      48 |     40 |      0 |       |       |          |
+|  20 |         TABLE ACCESS FULL    | SYS_TEMP_0FD9E0DFB_36070AA |      1 |   3781 | 68058 |     3   (0)| 00:00:01 |    108 |00:00:00.01 |       9 |      0 |      0 |       |       |          |
+|  21 |         TABLE ACCESS FULL    | SYS_TEMP_0FD9E0DFD_36070AA |      1 |      9 |   162 |     2   (0)| 00:00:01 |      3 |00:00:00.01 |       9 |      1 |      0 |       |       |          |
+|* 22 |         FILTER               |                            |      1 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  23 |          TABLE ACCESS FULL   | SYS_TEMP_0FD9E0DFD_36070AA |      0 |      9 |   162 |     2   (0)| 00:00:01 |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  24 |         TABLE ACCESS FULL    | SYS_TEMP_0FD9E0DFE_36070AA |      1 |      9 |   162 |     2   (0)| 00:00:01 |      1 |00:00:00.01 |       9 |      1 |      0 |       |       |          |
+|* 25 |         FILTER               |                            |      1 |        |       |            |          |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  26 |          TABLE ACCESS FULL   | SYS_TEMP_0FD9E0DFE_36070AA |      0 |      9 |   162 |     2   (0)| 00:00:01 |      0 |00:00:00.01 |       0 |      0 |      0 |       |       |          |
+|  27 |   SORT AGGREGATE             |                            |      1 |      1 |    65 |            |          |      1 |00:00:00.09 |      88 |     36 |      0 |       |       |          |
+|* 28 |    HASH JOIN                 |                            |      1 |     99 |  6435 |     5  (20)| 00:00:01 |  10692 |00:00:00.09 |      88 |     36 |      0 |  1995K|  1995K| 1668K (0)|
+|  29 |     VIEW                     |                            |      1 |     14 |   364 |     3  (34)| 00:00:01 |     27 |00:00:00.01 |      44 |     36 |      0 |       |       |          |
+|  30 |      HASH UNIQUE             |                            |      1 |     14 |   644 |     3  (34)| 00:00:01 |     27 |00:00:00.01 |      44 |     36 |      0 |  1520K|  1520K| 1246K (0)|
+|* 31 |       VIEW                   |                            |      1 |    190 |  8740 |     2   (0)| 00:00:01 |     27 |00:00:00.01 |      44 |     36 |      0 |       |       |          |
+|  32 |        TABLE ACCESS FULL     | SYS_TEMP_0FD9E0DFA_36070AA |      1 |    190 |  3420 |     2   (0)| 00:00:01 |  10843 |00:00:00.01 |      44 |     36 |      0 |       |       |          |
+|* 33 |     VIEW                     |                            |      1 |    190 |  7410 |     2   (0)| 00:00:01 |  10692 |00:00:00.01 |      44 |      0 |      0 |       |       |          |
+|  34 |      TABLE ACCESS FULL       | SYS_TEMP_0FD9E0DFA_36070AA |      1 |    190 |  3420 |     2   (0)| 00:00:01 |  10843 |00:00:00.01 |      44 |      0 |      0 |       |       |          |
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$860B0AB5
+   2 - SEL$658826F8
+   4 - SEL$B34AD944
+   6 - SEL$B34AD944 / SYS_TBL_$1$@SEL$B34AD944
+   9 - SEL$C39DFF13
+  11 - SEL$C39DFF13 / SYS_TEMP_0FD9E0DFB_36070AA@SEL$C39DFF13
+  16 - SEL$658826F9 / sys_view_v@SEL$658826F8
+  17 - SET$658826F8 / V@SEL$658826F9
+  18 - SET$658826F8
+  19 - SEL$658826FA / SYS_TEMP_0FD9E0DFC_36070AA@SEL$658826FA
+  20 - SEL$658826FB / SYS_TEMP_0FD9E0DFB_36070AA@SEL$658826FB
+  21 - SEL$658826FC / SYS_TEMP_0FD9E0DFD_36070AA@SEL$658826FC
+  22 - SEL$658826FD
+  23 - SEL$658826FD / SYS_TEMP_0FD9E0DFD_36070AA@SEL$658826FD
+  24 - SEL$658826FE / SYS_TEMP_0FD9E0DFE_36070AA@SEL$658826FE
+  25 - SEL$658826FF
+  26 - SEL$658826FF / SYS_TEMP_0FD9E0DFE_36070AA@SEL$658826FF
+  29 - SEL$2        / P@SEL$5
+  30 - SEL$2
+  31 - SEL$D67CB2D3 / DATA@SEL$2
+  32 - SEL$D67CB2D3 / T1@SEL$D67CB2D3
+  33 - SEL$D67CB2D2 / DATA@SEL$3
+  34 - SEL$D67CB2D2 / T1@SEL$D67CB2D2
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+  22 - filter(NULL IS NOT NULL)
+  25 - filter(NULL IS NOT NULL)
+  28 - access("P"."REGION_ID"="REGION_ID" AND "P"."PRODUCT_ID"="PRODUCT_ID")
+  31 - filter(("EMP_ID" IS NULL AND "DEPT_ID" IS NULL AND "PRODUCT_ID" IS NOT NULL))
+  33 - filter(("EMP_ID" IS NOT NULL AND "PRODUCT_ID" IS NOT NULL))
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+   1 - COUNT(*)[22]
+   2 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+   3 - "sys_view_v"."C0"[NUMBER,22], "sys_view_v"."C1"[NUMBER,22], "sys_view_v"."C2"[NUMBER,22], "sys_view_v"."C3"[NUMBER,22], "sys_view_v"."A0"[NUMBER,22]
+   4 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+   5 - (#keys=4) "SYS_TBL_$1$"."REGION_ID"[NUMBER,22], "SYS_TBL_$1$"."PRODUCT_ID"[NUMBER,22], "SYS_TBL_$1$"."DEPT_ID"[NUMBER,22], "SYS_TBL_$1$"."EMP_ID"[NUMBER,22],
+       SUM("SYS_TBL_$1$"."QTY")[22], SYSDEF[4], BIN_TO_NUM(GROUPING("SYS_TBL_$1$"."REGION_ID"),GROUPING("SYS_TBL_$1$"."DEPT_ID"),GROUPING("SYS_TBL_$1$"."PRODUCT_ID"),GROUPING("SYS_TBL_$1$"."EMP
+       _ID"))[22]
+   6 - "SYS_TBL_$1$"."REGION_ID"[NUMBER,22], "SYS_TBL_$1$"."DEPT_ID"[NUMBER,22], "SYS_TBL_$1$"."EMP_ID"[NUMBER,22], "SYS_TBL_$1$"."PRODUCT_ID"[NUMBER,22], "SYS_TBL_$1$"."QTY"[NUMBER,22]
+   7 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+   8 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+   9 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+  10 - (#keys=2) "C0"[NUMBER,22], "C1"[NUMBER,22], SUM("A0")[22], SYSDEF[4], BIN_TO_NUM(GROUPING("C0"),GROUPING("C1"),1,1)[22]
+  11 - "C0"[NUMBER,22], "C1"[NUMBER,22], "A0"[NUMBER,22]
+  12 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+  13 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+  14 - SYSDEF[4], SYSDEF[0], SYSDEF[1], SYSDEF[120], SYSDEF[0]
+  15 - "sys_view_v"."C0"[NUMBER,22], "sys_view_v"."C1"[NUMBER,22], "sys_view_v"."C2"[NUMBER,22], "sys_view_v"."C3"[NUMBER,22], "sys_view_v"."A0"[NUMBER,22]
+  16 - "sys_view_v"."C0"[NUMBER,22], "sys_view_v"."C1"[NUMBER,22], "sys_view_v"."C2"[NUMBER,22], "sys_view_v"."C3"[NUMBER,22], "sys_view_v"."A0"[NUMBER,22]
+  17 - "C0"[NUMBER,22], "C1"[NUMBER,22], "C2"[NUMBER,22], "C3"[NUMBER,22], "A0"[NUMBER,22]
+  18 - STRDEF[22], STRDEF[22], STRDEF[22], STRDEF[22], STRDEF[22]
+  19 - "SYS_TEMP_0FD9E0DFC_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFC_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFC_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFC_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFC_36070AA"."A0"[NUMBER,22]
+  20 - "SYS_TEMP_0FD9E0DFB_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFB_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFB_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFB_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFB_36070AA"."A0"[NUMBER,22]
+  21 - "SYS_TEMP_0FD9E0DFD_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFD_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."A0"[NUMBER,22]
+  22 - "SYS_TEMP_0FD9E0DFD_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFD_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."A0"[NUMBER,22]
+  23 - "SYS_TEMP_0FD9E0DFD_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFD_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFD_36070AA"."A0"[NUMBER,22]
+  24 - "SYS_TEMP_0FD9E0DFE_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFE_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."A0"[NUMBER,22]
+  25 - "SYS_TEMP_0FD9E0DFE_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFE_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."A0"[NUMBER,22]
+  26 - "SYS_TEMP_0FD9E0DFE_36070AA"."C0"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C1"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."C2"[NUMBER,22],
+       "SYS_TEMP_0FD9E0DFE_36070AA"."C3"[NUMBER,22], "SYS_TEMP_0FD9E0DFE_36070AA"."A0"[NUMBER,22]
+  27 - (#keys=0) COUNT(*)[22]
+  28 - (#keys=2; rowset=256) "P"."REGION_ID"[NUMBER,22], "REGION_ID"[NUMBER,22], "P"."PRODUCT_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22]
+  29 - (rowset=256) "P"."REGION_ID"[NUMBER,22], "P"."PRODUCT_ID"[NUMBER,22]
+  30 - (rowset=256) "REGION_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "QTY_SOLD"[NUMBER,22]
+  31 - (rowset=256) "REGION_ID"[NUMBER,22], "DEPT_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22], "QTY_SOLD"[NUMBER,22]
+  32 - (rowset=256) "C0"[NUMBER,22], "C1"[NUMBER,22], "C2"[NUMBER,22], "C3"[NUMBER,22], "C4"[NUMBER,22]
+  33 - (rowset=256) "REGION_ID"[NUMBER,22], "PRODUCT_ID"[NUMBER,22], "EMP_ID"[NUMBER,22]
+  34 - (rowset=256) "C0"[NUMBER,22], "C1"[NUMBER,22], "C2"[NUMBER,22], "C3"[NUMBER,22], "C4"[NUMBER,22]
+
+
+143 rows selected.
+
+Elapsed: 00:00:03.35
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'CSS initialization'
+	'CSS operation: action'
+	'CSS operation: query'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'KJC: Wait for msg sends to complete'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'direct path write temp'
+	'enq: IV -  contention'
+	'enq: TO - contention'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+
+CALL-NAME                            DURATION       %  CALLS      MEAN       MIN       MAX
+-----------------------------------  --------  ------  -----  --------  --------  --------
+EXEC                                 3.330000   80.3%      2  1.665000  0.000000  3.330000
+db file scattered read               0.295686    7.1%     43  0.006876  0.000618  0.047859
+acknowledge over PGA limit           0.181085    4.4%     11  0.016462  0.000007  0.100163
+direct path write temp               0.104917    2.5%      6  0.017486  0.010514  0.025487
+PARSE                                0.080000    1.9%      2  0.040000  0.001000  0.079000
+gc cr multi block grant              0.065258    1.6%     31  0.002105  0.000015  0.009677
+db file sequential read              0.038548    0.9%     39  0.000988  0.000139  0.009893
+enq: IV -  contention                0.018241    0.4%     23  0.000793  0.000253  0.002099
+CSS initialization                   0.006847    0.2%      2  0.003423  0.000051  0.006796
+FETCH                                0.006000    0.1%      2  0.003000  0.000000  0.006000
+SQL*Net message from client          0.005140    0.1%      3  0.001713  0.000560  0.003928
+gc cr grant 2-way                    0.004421    0.1%     11  0.000402  0.000063  0.000844
+PGA memory operation                 0.003123    0.1%     47  0.000066  0.000003  0.001282
+CSS operation: action                0.002736    0.1%      2  0.001368  0.001029  0.001707
+enq: TO - contention                 0.001966    0.0%      3  0.000655  0.000516  0.000831
+CSS operation: query                 0.001470    0.0%      6  0.000245  0.000001  0.001458
+KJC: Wait for msg sends to complete  0.000078    0.0%      2  0.000039  0.000032  0.000046
+SQL*Net message to client            0.000007    0.0%      3  0.000002  0.000002  0.000003
+Disk file operations I/O             0.000005    0.0%      1  0.000005  0.000005  0.000005
+CLOSE                                0.000000    0.0%      2  0.000000  0.000000  0.000000
+-----------------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (20)                           4.145528  100.0%    241  0.017201  0.000000  3.330000
+
+SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production

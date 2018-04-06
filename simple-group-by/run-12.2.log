@@ -1,0 +1,723 @@
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:23:33 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s1.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales - simple Group By
+
+  1  select count(*) from (
+  2  	select prod_id,channel_id,  count(*) prod_count
+  3  	from sh.sales
+  4  	group by prod_id, channel_id
+  5* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:04.83
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.10
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  g9sq072xs88yy, child number 0
+-------------------------------------
+select count(*) from (  select prod_id,channel_id,  count(*) prod_count
+ from sh.sales  group by prod_id, channel_id )
+
+Plan hash value: 4070617528
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation              | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |       |      1 |        |       |   435 (100)|          |       |       |      1 |00:00:02.90 |    1718 |   1607 |       |       |          |
+|   1 |  SORT AGGREGATE        |       |      1 |      1 |       |            |          |       |       |      1 |00:00:02.90 |    1718 |   1607 |       |       |          |
+|   2 |   VIEW                 |       |      1 |    204 |       |   435  (60)| 00:00:01 |       |       |    228 |00:00:02.90 |    1718 |   1607 |       |       |          |
+|   3 |    HASH GROUP BY       |       |      1 |    204 |  1428 |   435  (60)| 00:00:01 |       |       |    228 |00:00:02.90 |    1718 |   1607 |  1422K|  1422K| 1345K (0)|
+|   4 |     PARTITION RANGE ALL|       |      1 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:02.82 |    1718 |   1607 |       |       |          |
+|   5 |      TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:02.81 |    1718 |   1607 |       |       |          |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   5 - SEL$2 / SALES@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   2 - (rowset=1019)
+   3 - (rowset=1019) "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+   4 - (rowset=256) "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+   5 - (rowset=256) "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+
+
+35 rows selected.
+
+Elapsed: 00:00:01.13
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr disk read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+db file scattered read       2.489735   52.4%     17  0.146455  0.000341  0.329912
+db file sequential read      1.778417   37.4%    184  0.009665  0.000044  0.122099
+PARSE                        0.277000    5.8%      2  0.138500  0.000000  0.277000
+FETCH                        0.161000    3.4%      2  0.080500  0.000000  0.161000
+gc cr grant 2-way            0.022626    0.5%     96  0.000236  0.000000  0.001350
+gc cr multi block grant      0.015367    0.3%     24  0.000640  0.000217  0.001371
+SQL*Net message from client  0.003360    0.1%      3  0.001120  0.000635  0.001925
+gc current grant 2-way       0.001025    0.0%      4  0.000256  0.000045  0.000493
+gc cr disk read              0.000729    0.0%      1  0.000729  0.000729  0.000729
+PGA memory operation         0.000040    0.0%      6  0.000007  0.000000  0.000013
+SQL*Net message to client    0.000003    0.0%      3  0.000001  0.000001  0.000001
+Disk file operations I/O     0.000003    0.0%      2  0.000002  0.000000  0.000003
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (14)                   4.749305  100.0%    348  0.013647  0.000000  0.329912
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:23:41 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s2.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales - count() Analytic Function
+
+  1  select count(*)
+  2  from (
+  3  	select distinct prod_id
+  4  		, max(channel_id) over (partition by prod_id) channel_id
+  5  		, count(*) over (partition by prod_id, channel_id) prod_count
+  6  	from sh.sales
+  7* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:09.41
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.12
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  1as742ugsuu8d, child number 0
+-------------------------------------
+select count(*) from (  select distinct prod_id   , max(channel_id)
+over (partition by prod_id) channel_id   , count(*) over (partition by
+prod_id, channel_id) prod_count  from sh.sales )
+
+Plan hash value: 2285947986
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation               | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT        |       |      1 |        |       |  3414 (100)|          |       |       |      1 |00:00:09.14 |    1718 |   1606 |       |       |          |
+|   1 |  SORT AGGREGATE         |       |      1 |      1 |       |            |          |       |       |      1 |00:00:09.14 |    1718 |   1606 |       |       |          |
+|   2 |   VIEW                  |       |      1 |    204 |       |  3414  (14)| 00:00:01 |       |       |    228 |00:00:09.14 |    1718 |   1606 |       |       |          |
+|   3 |    HASH UNIQUE          |       |      1 |    204 |  1428 |  3414  (14)| 00:00:01 |       |       |    228 |00:00:09.14 |    1718 |   1606 |  1558K|  1558K| 1379K (0)|
+|   4 |     WINDOW SORT         |       |      1 |    204 |  1428 |  3414  (14)| 00:00:01 |       |       |    918K|00:00:07.98 |    1718 |   1606 |    23M|  1770K|   20M (0)|
+|   5 |      PARTITION RANGE ALL|       |      1 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:03.85 |    1718 |   1606 |       |       |          |
+|   6 |       TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:01.64 |    1718 |   1606 |       |       |          |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   6 - SEL$2 / SALES@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - "PROD_ID"[NUMBER,22], MAX("CHANNEL_ID") OVER ( PARTITION BY "PROD_ID")[22], COUNT(*) OVER ( PARTITION BY "PROD_ID","CHANNEL_ID")[22]
+   4 - (#keys=2) "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "PROD_ID","CHANNEL_ID")[22], MAX("CHANNEL_ID") OVER ( PARTITION BY
+       "PROD_ID")[22]
+   5 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+   6 - "PROD_ID"[NUMBER,22], "CHANNEL_ID"[NUMBER,22]
+
+
+38 rows selected.
+
+Elapsed: 00:00:00.87
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+FETCH                        5.636000   69.9%      2  2.818000  0.000000  5.636000
+acknowledge over PGA limit   1.684255   20.9%    168  0.010025  0.000048  0.052604
+PARSE                        0.274000    3.4%      2  0.137000  0.001000  0.273000
+db file scattered read       0.265495    3.3%     17  0.015617  0.000573  0.122275
+db file sequential read      0.143386    1.8%    175  0.000819  0.000279  0.067342
+gc cr grant 2-way            0.026889    0.3%     78  0.000345  0.000028  0.001018
+gc cr multi block grant      0.015420    0.2%     19  0.000812  0.000329  0.001430
+PGA memory operation         0.009047    0.1%    344  0.000026  0.000000  0.000960
+SQL*Net message from client  0.003336    0.0%      3  0.001112  0.000425  0.002320
+SQL*Net message to client    0.000010    0.0%      3  0.000003  0.000001  0.000007
+Disk file operations I/O     0.000004    0.0%      1  0.000004  0.000004  0.000004
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (13)                   8.057842  100.0%    816  0.009875  0.000000  5.636000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:23:54 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s3.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales with prod_count_total - simple Group By with Scalar Subquery
+
+  1  select count(*) from  (
+  2  select  s.prod_id
+  3  	, s.channel_id
+  4  	, count(*) prod_count_per_channel
+  5  	, (select /*+ no_push_pred no_merge */ count(*)  from sh.sales where prod_id = s.prod_id) prod_count_total
+  6  from sh.sales s
+  7  group by s.prod_id, s.channel_id
+  8  order by prod_id, channel_id
+  9* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:00.81
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.05
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  4wgbwqwupw2rq, child number 0
+-------------------------------------
+select count(*) from  ( select  s.prod_id  , s.channel_id  , count(*)
+prod_count_per_channel  , (select /*+ no_push_pred no_merge */ count(*)
+ from sh.sales where prod_id = s.prod_id) prod_count_total from
+sh.sales s group by s.prod_id, s.channel_id order by prod_id,
+channel_id )
+
+Plan hash value: 4070617528
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation              | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |       |      1 |        |       |  2515 (100)|          |       |       |      1 |00:00:00.40 |    1718 |   1607 |       |       |          |
+|   1 |  SORT AGGREGATE        |       |      1 |      1 |       |            |          |       |       |      1 |00:00:00.40 |    1718 |   1607 |       |       |          |
+|   2 |   VIEW                 |       |      1 |    204 |       |  2515  (11)| 00:00:01 |       |       |    228 |00:00:00.40 |    1718 |   1607 |       |       |          |
+|   3 |    HASH GROUP BY       |       |      1 |    204 |  1428 |  2515  (11)| 00:00:01 |       |       |    228 |00:00:00.40 |    1718 |   1607 |  1422K|  1422K| 1346K (0)|
+|   4 |     PARTITION RANGE ALL|       |      1 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.34 |    1718 |   1607 |       |       |          |
+|   5 |      TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.33 |    1718 |   1607 |       |       |          |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$73523A42 / from$_subquery$_001@SEL$1
+   3 - SEL$73523A42
+   5 - SEL$73523A42 / S@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   2 - (rowset=1019)
+   3 - (rowset=1019) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+   4 - (rowset=256) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+   5 - (rowset=256) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+38 rows selected.
+
+Elapsed: 00:00:00.92
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr disk read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+db file sequential read      0.211004   28.3%    184  0.001147  0.000028  0.049413
+PARSE                        0.210000   28.1%      2  0.105000  0.000000  0.210000
+FETCH                        0.134000   18.0%      2  0.067000  0.000000  0.134000
+db file scattered read       0.124982   16.7%     17  0.007352  0.000487  0.008914
+gc cr multi block grant      0.042542    5.7%     23  0.001850  0.000406  0.025573
+gc cr grant 2-way            0.019532    2.6%     96  0.000203  0.000000  0.000766
+SQL*Net message from client  0.001515    0.2%      3  0.000505  0.000333  0.000835
+gc current grant 2-way       0.001040    0.1%      4  0.000260  0.000095  0.000452
+EXEC                         0.001000    0.1%      2  0.000500  0.000000  0.001000
+gc cr disk read              0.000355    0.0%      1  0.000355  0.000355  0.000355
+PGA memory operation         0.000187    0.0%     10  0.000019  0.000002  0.000123
+Disk file operations I/O     0.000012    0.0%      2  0.000006  0.000002  0.000010
+SQL*Net message to client    0.000003    0.0%      3  0.000001  0.000001  0.000001
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (14)                   0.746172  100.0%    351  0.002126  0.000000  0.210000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:23:58 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s3a.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales with prod_count_total - via Group By and join
+
+  1  select count(*) from  (
+  2  select  s.prod_id
+  3  	, s.channel_id
+  4  	, count(*) prod_count_per_channel
+  5  	, t.prod_count_total
+  6  from
+  7  (
+  8  	select prod_id
+  9  		, count(*) prod_count_total
+ 10  	from sh.sales
+ 11  	group by prod_id
+ 12  ) t
+ 13  join sh.sales s on t.prod_id = s.prod_id
+ 14  group by s.prod_id, s.channel_id, t.prod_count_total
+ 15  order by prod_id, channel_id
+ 16* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:01.39
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.06
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  4mr08nrku6qhh, child number 0
+-------------------------------------
+select count(*) from  ( select  s.prod_id  , s.channel_id  , count(*)
+prod_count_per_channel  , t.prod_count_total from (  select prod_id   ,
+count(*) prod_count_total  from sh.sales  group by prod_id ) t join
+sh.sales s on t.prod_id = s.prod_id group by s.prod_id, s.channel_id,
+t.prod_count_total order by prod_id, channel_id )
+
+Plan hash value: 3423221962
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name           | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                |      1 |        |       |   671 (100)|          |       |       |      1 |00:00:00.98 |    2003 |   1676 |       |       |          |
+|   1 |  SORT AGGREGATE                     |                |      1 |      1 |       |            |          |       |       |      1 |00:00:00.98 |    2003 |   1676 |       |       |          |
+|   2 |   VIEW                              |                |      1 |    204 |       |   671  (70)| 00:00:01 |       |       |    228 |00:00:00.98 |    2003 |   1676 |       |       |          |
+|   3 |    HASH GROUP BY                    |                |      1 |    204 |  7548 |   671  (70)| 00:00:01 |       |       |    228 |00:00:00.98 |    2003 |   1676 |  1088K|  1088K| 1356K (0)|
+|*  4 |     HASH JOIN                       |                |      1 |    249 |  9213 |   670  (70)| 00:00:01 |       |       |    228 |00:00:00.98 |    2003 |   1676 |  1922K|  1922K| 1638K (0)|
+|   5 |      VIEW                           |                |      1 |     72 |  1224 |   235  (88)| 00:00:01 |       |       |     72 |00:00:00.28 |     240 |     65 |       |       |          |
+|   6 |       HASH GROUP BY                 |                |      1 |     72 |   288 |   235  (88)| 00:00:01 |       |       |     72 |00:00:00.28 |     240 |     65 |  1558K|  1558K| 1359K (0)|
+|   7 |        PARTITION RANGE ALL          |                |      1 |    918K|  3589K|    29   (0)| 00:00:01 |     1 |    28 |   1074 |00:00:00.28 |     240 |     65 |       |       |          |
+|   8 |         BITMAP CONVERSION COUNT     |                |     28 |    918K|  3589K|    29   (0)| 00:00:01 |       |       |   1074 |00:00:00.27 |     240 |     65 |       |       |          |
+|   9 |          BITMAP INDEX FAST FULL SCAN| SALES_PROD_BIX |     28 |        |       |            |          |     1 |    28 |   1074 |00:00:00.26 |     240 |     65 |       |       |          |
+|  10 |      VIEW                           | VW_GBF_8       |      1 |    204 |  4080 |   435  (60)| 00:00:01 |       |       |    228 |00:00:00.43 |    1718 |   1605 |       |       |          |
+|  11 |       HASH GROUP BY                 |                |      1 |    204 |  1428 |   435  (60)| 00:00:01 |       |       |    228 |00:00:00.43 |    1718 |   1605 |  1422K|  1422K| 1349K (0)|
+|  12 |        PARTITION RANGE ALL          |                |      1 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.36 |    1718 |   1605 |       |       |          |
+|  13 |         TABLE ACCESS FULL           | SALES          |     28 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.33 |    1718 |   1605 |       |       |          |
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$0E70E431 / from$_subquery$_001@SEL$1
+   3 - SEL$0E70E431
+   5 - SEL$3        / T@SEL$2
+   6 - SEL$3
+   8 - SEL$3        / SALES@SEL$3
+  10 - SEL$C73A2042 / VW_GBF_8@SEL$4A27C112
+  11 - SEL$C73A2042
+  13 - SEL$C73A2042 / S@SEL$2
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   4 - access("T"."PROD_ID"="ITEM_1")
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   2 - (rowset=1019)
+   3 - (rowset=1019) "ITEM_1"[NUMBER,22], "ITEM_3"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22], SUM("ITEM_2")[22]
+   4 - (#keys=1; rowset=256) "ITEM_1"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22], "ITEM_3"[NUMBER,22], "ITEM_2"[NUMBER,22]
+   5 - (rowset=256) "T"."PROD_ID"[NUMBER,22], "T"."PROD_COUNT_TOTAL"[NUMBER,22]
+   6 - (rowset=256) "PROD_ID"[NUMBER,22], COUNT(*)[22]
+   7 - COUNT(*)[22], "PROD_ID"[NUMBER,22]
+   8 - COUNT(*)[22], "PROD_ID"[NUMBER,22]
+   9 - STRDEF[BM VAR, 10], STRDEF[BM VAR, 10], STRDEF[BM VAR, 7920], "PROD_ID"[NUMBER,22]
+  10 - (rowset=256) "ITEM_1"[NUMBER,22], "ITEM_2"[NUMBER,22], "ITEM_3"[NUMBER,22]
+  11 - (rowset=256) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*)[22]
+  12 - (rowset=256) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+  13 - (rowset=256) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+64 rows selected.
+
+Elapsed: 00:00:01.47
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'enq: JZ - Join group dictionary'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                        DURATION       %  CALLS      MEAN       MIN       MAX
+-------------------------------  --------  ------  -----  --------  --------  --------
+db file sequential read          0.469791   35.4%    205  0.002292  0.000283  0.180183
+db file scattered read           0.293073   22.1%     33  0.008881  0.000505  0.039453
+PARSE                            0.285000   21.5%      2  0.142500  0.000000  0.285000
+FETCH                            0.205000   15.5%      2  0.102500  0.000000  0.205000
+gc cr grant 2-way                0.036179    2.7%     96  0.000377  0.000050  0.003393
+gc cr multi block grant          0.020356    1.5%     27  0.000754  0.000022  0.005446
+EXEC                             0.010000    0.8%      2  0.005000  0.000000  0.010000
+SQL*Net message from client      0.003436    0.3%      3  0.001145  0.000480  0.002165
+PGA memory operation             0.001990    0.2%     59  0.000034  0.000000  0.000771
+gc current grant 2-way           0.000466    0.0%      1  0.000466  0.000466  0.000466
+enq: JZ - Join group dictionary  0.000395    0.0%      1  0.000395  0.000395  0.000395
+SQL*Net message to client        0.000122    0.0%      3  0.000041  0.000002  0.000117
+Disk file operations I/O         0.000019    0.0%      2  0.000010  0.000005  0.000014
+CLOSE                            0.000000    0.0%      2  0.000000  0.000000  0.000000
+-------------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (14)                       1.325827  100.0%    438  0.003027  0.000000  0.285000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:24:05 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s4.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+count of Sales with prod_count_total - via count() Analytic Function
+
+  1  select count(*) from  (
+  2  select  distinct
+  3  	s.prod_id
+  4  	, s.channel_id
+  5  	, count(*) over (partition by s.prod_id, s.channel_id) prod_count_per_channel
+  6  	, count(*) over (partition by s.prod_id) prod_count_total
+  7  from sh.sales s
+  8  --group by s.prod_id, s.channel_id
+  9  order by prod_id, channel_id
+ 10* )
+
+  COUNT(*)
+----------
+       228
+
+1 row selected.
+
+Elapsed: 00:00:03.40
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.05
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  bwdcpvtu5kpb7, child number 0
+-------------------------------------
+select count(*) from  ( select  distinct  s.prod_id  , s.channel_id  ,
+count(*) over (partition by s.prod_id, s.channel_id)
+prod_count_per_channel  , count(*) over (partition by s.prod_id)
+prod_count_total from sh.sales s --group by s.prod_id, s.channel_id
+order by prod_id, channel_id )
+
+Plan hash value: 197557324
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation               | Name  | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | Pstart| Pstop | A-Rows |   A-Time   | Buffers | Reads  |  OMem |  1Mem | Used-Mem |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT        |       |      1 |        |       |   435 (100)|          |       |       |      1 |00:00:02.98 |    1718 |   1607 |       |       |          |
+|   1 |  SORT AGGREGATE         |       |      1 |      1 |       |            |          |       |       |      1 |00:00:02.98 |    1718 |   1607 |       |       |          |
+|   2 |   VIEW                  |       |      1 |    204 |       |   435  (60)| 00:00:01 |       |       |    228 |00:00:02.98 |    1718 |   1607 |       |       |          |
+|   3 |    SORT UNIQUE          |       |      1 |    204 |  1428 |   229  (23)| 00:00:01 |       |       |    228 |00:00:02.98 |    1718 |   1607 | 15360 | 15360 |14336  (0)|
+|   4 |     WINDOW SORT         |       |      1 |    204 |  1428 |   435  (60)| 00:00:01 |       |       |    918K|00:00:02.76 |    1718 |   1607 |    23M|  1770K|   20M (0)|
+|   5 |      PARTITION RANGE ALL|       |      1 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.40 |    1718 |   1607 |       |       |          |
+|   6 |       TABLE ACCESS FULL | SALES |     28 |    918K|  6281K|   229  (23)| 00:00:01 |     1 |    28 |    918K|00:00:00.32 |    1718 |   1607 |       |       |          |
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$1
+   2 - SEL$2 / from$_subquery$_001@SEL$1
+   3 - SEL$2
+   6 - SEL$2 / S@SEL$2
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) COUNT(*)[22]
+   3 - (#keys=4) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "S"."PROD_ID","S"."CHANNEL_ID")[22], COUNT(*) OVER ( PARTITION BY
+       "S"."PROD_ID")[22]
+   4 - (#keys=2) "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22], COUNT(*) OVER ( PARTITION BY "S"."PROD_ID")[22], COUNT(*) OVER ( PARTITION BY
+       "S"."PROD_ID","S"."CHANNEL_ID")[22]
+   5 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+   6 - "S"."PROD_ID"[NUMBER,22], "S"."CHANNEL_ID"[NUMBER,22]
+
+
+41 rows selected.
+
+Elapsed: 00:00:00.63
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr disk read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+acknowledge over PGA limit   1.403132   48.8%    157  0.008937  0.007162  0.014628
+FETCH                        0.905000   31.5%      2  0.452500  0.000000  0.905000
+PARSE                        0.227000    7.9%      2  0.113500  0.000000  0.227000
+db file sequential read      0.151821    5.3%    176  0.000863  0.000001  0.042264
+db file scattered read       0.127586    4.4%     17  0.007505  0.000757  0.010958
+gc cr grant 2-way            0.027764    1.0%     95  0.000292  0.000000  0.004986
+gc cr multi block grant      0.020179    0.7%     24  0.000841  0.000140  0.002590
+PGA memory operation         0.005287    0.2%    334  0.000016  0.000000  0.000395
+SQL*Net message from client  0.003620    0.1%      3  0.001207  0.000422  0.002356
+gc current grant 2-way       0.001341    0.0%      4  0.000335  0.000204  0.000496
+EXEC                         0.001000    0.0%      2  0.000500  0.000000  0.001000
+gc cr disk read              0.000078    0.0%      1  0.000078  0.000078  0.000078
+Disk file operations I/O     0.000012    0.0%      2  0.000006  0.000003  0.000009
+SQL*Net message to client    0.000004    0.0%      3  0.000001  0.000001  0.000002
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (15)                   2.873824  100.0%    824  0.003488  0.000000  0.905000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production

@@ -1,0 +1,721 @@
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:19:10 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s1.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.06
+SQL> 
+lead() via scalar subquery
+
+  1  with data as (
+  2  	select tmain.id
+  3  		, (select id from t1 where id = tmain.id -1 ) previous_id
+  4  	from t1 tmain
+  5  )
+  6* select min(id), max(previous_id)  from data
+
+   MIN(ID) MAX(PREVIOUS_ID)
+---------- ----------------
+         1           999999
+
+1 row selected.
+
+Elapsed: 00:00:07.50
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.20
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  gzb2mr5d53b0t, child number 0
+-------------------------------------
+with data as (  select tmain.id   , (select id from t1 where id =
+tmain.id -1 ) previous_id  from t1 tmain ) select min(id),
+max(previous_id)  from data
+
+Plan hash value: 1032533278
+
+-----------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation          | Name      | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  |
+-----------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |           |      1 |        |       |  1990K(100)|          |      1 |00:00:07.44 |   28116 |   3603 |
+|*  1 |  INDEX RANGE SCAN  | T1_PK_IDX |   1000K|      1 |     5 |     2   (0)| 00:00:01 |    999K|00:00:05.72 |   26725 |   2231 |
+|   2 |  SORT AGGREGATE    |           |      1 |      1 |     5 |            |          |      1 |00:00:07.44 |   28116 |   3603 |
+|   3 |   TABLE ACCESS FULL| T1        |      1 |   1000K|  4882K|   173  (24)| 00:00:01 |   1000K|00:00:01.39 |    1391 |   1372 |
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$2        / T1@SEL$2
+   2 - SEL$F1D6E378
+   3 - SEL$F1D6E378 / TMAIN@SEL$1
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("ID"=:B1-1)
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - "ID"[NUMBER,22]
+   2 - (#keys=0) MAX()[22], MIN("TMAIN"."ID")[22]
+   3 - "TMAIN"."ID"[NUMBER,22]
+
+
+36 rows selected.
+
+Elapsed: 00:00:02.32
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current block 2-way'
+	'gc current block busy'
+	'gc current grant 2-way'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+db file sequential read      3.854431   54.3%  2,252  0.001712  0.000000  0.248096
+FETCH                        1.374000   19.4%      2  0.687000  0.000000  1.374000
+db file scattered read       1.198083   16.9%     26  0.046080  0.001168  0.179164
+gc cr grant 2-way            0.583387    8.2%  1,155  0.000505  0.000000  0.010791
+gc current block busy        0.047554    0.7%      1  0.047554  0.047554  0.047554
+gc cr multi block grant      0.018867    0.3%     21  0.000898  0.000206  0.005483
+PARSE                        0.015000    0.2%      2  0.007500  0.000000  0.015000
+SQL*Net message from client  0.000757    0.0%      3  0.000252  0.000099  0.000402
+gc current grant 2-way       0.000460    0.0%      1  0.000460  0.000460  0.000460
+gc current block 2-way       0.000299    0.0%      2  0.000150  0.000029  0.000270
+Disk file operations I/O     0.000016    0.0%      3  0.000005  0.000000  0.000012
+SQL*Net message to client    0.000002    0.0%      3  0.000001  0.000000  0.000001
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (14)                   7.092856  100.0%  3,475  0.002041  0.000000  1.374000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:19:26 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s2.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.08
+SQL> 
+lead() and lag() via scalar subquery
+
+  1  with data as (
+  2  	select tmain.id
+  3  		, (select id from t1 where id = tmain.id -1 ) previous_id
+  4  		,(select id from t1 where id = tmain.id +1 ) next_id
+  5  	from t1 tmain
+  6  )
+  7* select min(id), max(previous_id)  from data
+
+   MIN(ID) MAX(PREVIOUS_ID)
+---------- ----------------
+         1           999999
+
+1 row selected.
+
+Elapsed: 00:00:32.49
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.02
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.17
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  9yau1vfbyurk7, child number 0
+-------------------------------------
+with data as (  select tmain.id   , (select id from t1 where id =
+tmain.id -1 ) previous_id   ,(select id from t1 where id = tmain.id +1
+) next_id  from t1 tmain ) select min(id), max(previous_id)  from data
+
+Plan hash value: 1032533278
+
+-----------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation          | Name      | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  |
+-----------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |           |      1 |        |       |  1990K(100)|          |      1 |00:00:26.70 |   28116 |   3603 |
+|*  1 |  INDEX RANGE SCAN  | T1_PK_IDX |   1000K|      1 |     5 |     2   (0)| 00:00:01 |    999K|00:00:13.81 |   26725 |   2231 |
+|   2 |  SORT AGGREGATE    |           |      1 |      1 |     5 |            |          |      1 |00:00:26.70 |   28116 |   3603 |
+|   3 |   TABLE ACCESS FULL| T1        |      1 |   1000K|  4882K|   173  (24)| 00:00:01 |   1000K|00:00:02.77 |    1391 |   1372 |
+-----------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$2        / T1@SEL$2
+   2 - SEL$16C51A37
+   3 - SEL$16C51A37 / TMAIN@SEL$1
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("ID"=:B1-1)
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - "ID"[NUMBER,22]
+   2 - (#keys=0) MAX()[22], MIN("TMAIN"."ID")[22]
+   3 - "TMAIN"."ID"[NUMBER,22]
+
+
+36 rows selected.
+
+Elapsed: 00:00:02.52
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'db file scattered read'
+	'db file sequential read'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                     DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  ---------  ------  -----  --------  --------  --------
+FETCH                         8.841000   65.0%      2  4.420500  0.000000  8.841000
+db file sequential read       3.612254   26.6%  2,254  0.001603  0.000135  0.210423
+gc cr grant 2-way             0.869133    6.4%  1,096  0.000793  0.000034  0.058783
+db file scattered read        0.191759    1.4%     26  0.007375  0.000587  0.102697
+gc cr multi block grant       0.032912    0.2%     21  0.001567  0.000015  0.007652
+PARSE                         0.032000    0.2%      2  0.016000  0.001000  0.031000
+gc current grant 2-way        0.010227    0.1%      1  0.010227  0.010227  0.010227
+SQL*Net message from client   0.002572    0.0%      3  0.000857  0.000575  0.001062
+EXEC                          0.002000    0.0%      2  0.001000  0.000000  0.002000
+CLOSE                         0.001000    0.0%      2  0.000500  0.000000  0.001000
+Disk file operations I/O      0.000344    0.0%      2  0.000172  0.000004  0.000340
+SQL*Net message to client     0.000006    0.0%      3  0.000002  0.000002  0.000002
+---------------------------  ---------  ------  -----  --------  --------  --------
+TOTAL (12)                   13.595207  100.0%  3,414  0.003982  0.000000  8.841000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:20:09 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s3.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+lead() via outer join
+
+  1  with data as (
+  2  	select tmain.id
+  3  		, (select id from t1 where id = tmain.id -1 ) previous_id
+  4  	from t1 tmain
+  5  	left outer join t1 aux on aux.id = tmain.id - 1
+  6  )
+  7* select min(id), max(previous_id)  from data
+
+   MIN(ID) MAX(PREVIOUS_ID)
+---------- ----------------
+         1           999999
+
+1 row selected.
+
+Elapsed: 00:00:12.41
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.14
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  6hbsnsqbhfyqd, child number 0
+-------------------------------------
+with data as (  select tmain.id   , (select id from t1 where id =
+tmain.id -1 ) previous_id  from t1 tmain  left outer join t1 aux on
+aux.id = tmain.id - 1 ) select min(id), max(previous_id)  from data
+
+Plan hash value: 977356071
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation           | Name      | Starts | E-Rows |E-Bytes|E-Temp | Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  | Writes |  OMem |  1Mem | Used-Mem | Used-Tmp|
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT    |           |      1 |        |       |       |  1991K(100)|          |      1 |00:00:12.30 |     225K|   6843 |   3240 |       |       |          |         |
+|*  1 |  INDEX RANGE SCAN   | T1_PK_IDX |   1000K|      1 |     5 |       |     2   (0)| 00:00:01 |    999K|00:00:04.93 |     222K|   2231 |      0 |       |       |          |         |
+|   2 |  SORT AGGREGATE     |           |      1 |      1 |    10 |       |            |          |      1 |00:00:12.30 |     225K|   6843 |   3240 |       |       |          |         |
+|*  3 |   HASH JOIN OUTER   |           |      1 |   1000K|  9765K|    16M|  1225  (15)| 00:00:01 |   1000K|00:00:06.81 |    2781 |   4612 |   3240 |    56M|  9891K|   30M (1)|   27648 |
+|   4 |    TABLE ACCESS FULL| T1        |      1 |   1000K|  4882K|       |   173  (24)| 00:00:01 |   1000K|00:00:00.56 |    1391 |   1372 |      0 |       |       |          |         |
+|   5 |    TABLE ACCESS FULL| T1        |      1 |   1000K|  4882K|       |   173  (24)| 00:00:01 |   1000K|00:00:00.09 |    1390 |      0 |      0 |       |       |          |         |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$3        / T1@SEL$3
+   2 - SEL$BE0132A0
+   4 - SEL$BE0132A0 / TMAIN@SEL$1
+   5 - SEL$BE0132A0 / AUX@SEL$1
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("ID"=:B1-1)
+   3 - access("AUX"."ID"="TMAIN"."ID"-1)
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - "ID"[NUMBER,22]
+   2 - (#keys=0) MAX()[22], MIN("TMAIN"."ID")[22]
+   3 - (#keys=1) "TMAIN"."ID"[NUMBER,22]
+   4 - "TMAIN"."ID"[NUMBER,22]
+   5 - "AUX"."ID"[NUMBER,22]
+
+Note
+-----
+   - this is an adaptive plan
+
+
+46 rows selected.
+
+Elapsed: 00:00:01.26
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'CSS initialization'
+	'CSS operation: action'
+	'CSS operation: query'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'direct path read temp'
+	'direct path write temp'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                     DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  ---------  ------  -----  --------  --------  --------
+acknowledge over PGA limit    2.658408   25.6%    178  0.014935  0.000044  0.064116
+FETCH                         2.422000   23.4%      2  1.211000  0.000000  2.422000
+db file sequential read       2.263688   21.8%  2,256  0.001003  0.000000  0.044802
+direct path write temp        1.424967   13.7%      3  0.474989  0.207098  0.855698
+gc cr grant 2-way             0.797326    7.7%  1,159  0.000688  0.000000  0.053780
+direct path read temp         0.405385    3.9%    141  0.002875  0.000316  0.155102
+db file scattered read        0.176967    1.7%     26  0.006806  0.000674  0.017833
+gc cr multi block grant       0.128202    1.2%     16  0.008013  0.000311  0.112991
+SQL*Net message from client   0.034425    0.3%      3  0.011475  0.000622  0.024440
+CSS initialization            0.022391    0.2%      2  0.011196  0.000018  0.022373
+PARSE                         0.019000    0.2%      2  0.009500  0.000000  0.019000
+PGA memory operation          0.009537    0.1%    325  0.000029  0.000000  0.001187
+CSS operation: action         0.001467    0.0%      2  0.000733  0.000542  0.000925
+CSS operation: query          0.000544    0.0%      6  0.000091  0.000000  0.000538
+gc current grant 2-way        0.000337    0.0%      1  0.000337  0.000337  0.000337
+Disk file operations I/O      0.000015    0.0%      3  0.000005  0.000002  0.000010
+SQL*Net message to client     0.000004    0.0%      3  0.000001  0.000001  0.000002
+CLOSE                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                          0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  ---------  ------  -----  --------  --------  --------
+TOTAL (19)                   10.364663  100.0%  4,132  0.002508  0.000000  2.422000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:20:26 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s4.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.05
+SQL> 
+lead() and lag() via 2 outer joins
+
+  1  with data as (
+  2  	select tmain.id
+  3  		, (select id from t1 where id = tmain.id -1 ) previous_id
+  4  	from t1 tmain
+  5  	left outer join t1 aux on aux.id = tmain.id - 1
+  6  	left outer join t1 aux on aux.id = tmain.id + 1
+  7  )
+  8* select min(id), max(previous_id)  from data
+
+   MIN(ID) MAX(PREVIOUS_ID)
+---------- ----------------
+         1           999999
+
+1 row selected.
+
+Elapsed: 00:00:43.65
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.00
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.13
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  1c4rs8umcuths, child number 0
+-------------------------------------
+with data as (  select tmain.id   , (select id from t1 where id =
+tmain.id -1 ) previous_id  from t1 tmain  left outer join t1 aux on
+aux.id = tmain.id - 1  left outer join t1 aux on aux.id = tmain.id + 1
+) select min(id), max(previous_id)  from data
+
+Plan hash value: 3882027682
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation              | Name      | Starts | E-Rows |E-Bytes|E-Temp | Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  | Writes |  OMem |  1Mem | Used-Mem | Used-Tmp|
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT       |           |      1 |        |       |       |  1993K(100)|          |      1 |00:00:41.69 |    2002K|  11553 |   7950 |       |       |          |         |
+|*  1 |  INDEX RANGE SCAN      | T1_PK_IDX |   1000K|      1 |     5 |       |     2   (0)| 00:00:01 |    999K|00:00:07.40 |    1998K|   2231 |      0 |       |       |          |         |
+|   2 |  SORT AGGREGATE        |           |      1 |      1 |    15 |       |            |          |      1 |00:00:41.69 |    2002K|  11553 |   7950 |       |       |          |         |
+|*  3 |   HASH JOIN RIGHT OUTER|           |      1 |   1000K|    14M|    16M|  2392  (13)| 00:00:01 |   1000K|00:00:29.17 |    4171 |   9322 |   7950 |    48M|  6400K|   16M (1)|   34816 |
+|   4 |    TABLE ACCESS FULL   | T1        |      1 |   1000K|  4882K|       |   173  (24)| 00:00:01 |   1000K|00:00:00.22 |    1391 |   1372 |      0 |       |       |          |         |
+|*  5 |    HASH JOIN OUTER     |           |      1 |   1000K|  9765K|    16M|  1225  (15)| 00:00:01 |   1000K|00:00:20.94 |    2780 |   3870 |   5550 |    56M|  9891K|   22M (1)|   33792 |
+|   6 |     TABLE ACCESS FULL  | T1        |      1 |   1000K|  4882K|       |   173  (24)| 00:00:01 |   1000K|00:00:01.41 |    1390 |      0 |      0 |       |       |          |         |
+|   7 |     TABLE ACCESS FULL  | T1        |      1 |   1000K|  4882K|       |   173  (24)| 00:00:01 |   1000K|00:00:01.12 |    1390 |      0 |      0 |       |       |          |         |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$4        / T1@SEL$4
+   2 - SEL$D4E0E55D
+   4 - SEL$D4E0E55D / AUX@SEL$2
+   6 - SEL$D4E0E55D / TMAIN@SEL$1
+   7 - SEL$D4E0E55D / AUX@SEL$1
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("ID"=:B1-1)
+   3 - access("AUX"."ID"="TMAIN"."ID"+1)
+   5 - access("AUX"."ID"="TMAIN"."ID"-1)
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - "ID"[NUMBER,22]
+   2 - (#keys=0) MAX()[22], MIN("TMAIN"."ID")[22]
+   3 - (#keys=1) "TMAIN"."ID"[NUMBER,22]
+   4 - (rowset=256) "AUX"."ID"[NUMBER,22]
+   5 - (#keys=1) "TMAIN"."ID"[NUMBER,22]
+   6 - "TMAIN"."ID"[NUMBER,22]
+   7 - "AUX"."ID"[NUMBER,22]
+
+Note
+-----
+   - this is an adaptive plan
+
+
+53 rows selected.
+
+Elapsed: 00:00:01.56
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'CSS initialization'
+	'CSS operation: action'
+	'CSS operation: query'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file scattered read'
+	'db file sequential read'
+	'direct path read temp'
+	'direct path write temp'
+	'gc cr grant 2-way'
+	'gc cr multi block grant'
+	'gc current grant 2-way'
+
+CALL-NAME                     DURATION       %  CALLS       MEAN       MIN        MAX
+---------------------------  ---------  ------  -----  ---------  --------  ---------
+FETCH                        25.258000   75.4%      2  12.629000  0.000000  25.258000
+direct path write temp        3.922926   11.7%     23   0.170562  0.000056   1.254920
+acknowledge over PGA limit    1.551108    4.6%    117   0.013257  0.000012   0.079857
+direct path read temp         1.189382    3.5%    260   0.004575  0.000518   0.234938
+db file sequential read       1.025139    3.1%  2,256   0.000454  0.000125   0.050875
+gc cr grant 2-way             0.358643    1.1%  1,096   0.000327  0.000020   0.033688
+db file scattered read        0.102364    0.3%     26   0.003937  0.000295   0.012799
+gc cr multi block grant       0.047583    0.1%     22   0.002163  0.000010   0.029701
+PARSE                         0.028000    0.1%      2   0.014000  0.001000   0.027000
+PGA memory operation          0.019606    0.1%    446   0.000044  0.000000   0.005175
+CSS initialization            0.006333    0.0%      2   0.003167  0.000022   0.006311
+SQL*Net message from client   0.003231    0.0%      3   0.001077  0.000575   0.001603
+CSS operation: action         0.001065    0.0%      2   0.000532  0.000527   0.000538
+EXEC                          0.001000    0.0%      2   0.000500  0.000000   0.001000
+CSS operation: query          0.000634    0.0%      6   0.000106  0.000000   0.000621
+gc current grant 2-way        0.000222    0.0%      1   0.000222  0.000222   0.000222
+Disk file operations I/O      0.000151    0.0%      2   0.000075  0.000047   0.000104
+SQL*Net message to client     0.000006    0.0%      3   0.000002  0.000002   0.000002
+CLOSE                         0.000000    0.0%      2   0.000000  0.000000   0.000000
+---------------------------  ---------  ------  -----  ---------  --------  ---------
+TOTAL (19)                   33.515393  100.0%  4,273   0.007844  0.000000  25.258000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
+
+SQL*Plus: Release 12.1.0.2.0 Production on Thu Apr 5 17:21:15 2018
+
+Copyright (c) 1982, 2014, Oracle.  All rights reserved.
+
+SQL> SQL> Connected.
+SQL> Flushing Shared Spool and Buffer Cache
+
+SQL> 
+================================ s5.sql =================================
+
+SQL> 
+Tracefile ID:
+
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+lead() and lag() analytic functions
+
+  1  with data as (
+  2  	select tmain.id
+  3  		, lag(tmain.id) over ( order by id ) previous_id
+  4  		, lead(tmain.id) over ( order by id ) next_id
+  5  	from t1 tmain
+  6  )
+  7* select min(id), max(previous_id)  from data
+
+   MIN(ID) MAX(PREVIOUS_ID)
+---------- ----------------
+         1           999999
+
+1 row selected.
+
+Elapsed: 00:00:08.78
+SQL> 
+Session altered.
+
+Elapsed: 00:00:00.01
+SQL> 
+
+
+
+1 row selected.
+
+Elapsed: 00:00:00.07
+SQL> 
+PLAN_TABLE_OUTPUT
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+SQL_ID  av8aqykvtxuc5, child number 0
+-------------------------------------
+with data as (  select tmain.id   , lag(tmain.id) over ( order by id )
+previous_id   , lead(tmain.id) over ( order by id ) next_id  from t1
+tmain ) select min(id), max(previous_id)  from data
+
+Plan hash value: 3531436620
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+| Id  | Operation          | Name      | Starts | E-Rows |E-Bytes| Cost (%CPU)| E-Time   | A-Rows |   A-Time   | Buffers | Reads  | Writes |  OMem |  1Mem | Used-Mem | Used-Tmp|
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT   |           |      1 |        |       |  2282 (100)|          |      1 |00:00:08.75 |    2230 |   5178 |   2950 |       |       |          |         |
+|   1 |  SORT AGGREGATE    |           |      1 |      1 |    26 |            |          |      1 |00:00:08.75 |    2230 |   5178 |   2950 |       |       |          |         |
+|   2 |   VIEW             |           |      1 |   1000K|    24M|  2282   (3)| 00:00:01 |   1000K|00:00:08.67 |    2230 |   5178 |   2950 |       |       |          |         |
+|   3 |    WINDOW BUFFER   |           |      1 |   1000K|  4882K|  2282   (3)| 00:00:01 |   1000K|00:00:08.53 |    2230 |   5178 |   2950 |    25M|  1849K|   37M (0)|   24576 |
+|   4 |     INDEX FULL SCAN| T1_PK_IDX |      1 |   1000K|  4882K|  2282   (3)| 00:00:01 |   1000K|00:00:01.66 |    2228 |   2228 |      0 |       |       |          |         |
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Query Block Name / Object Alias (identified by operation id):
+-------------------------------------------------------------
+
+   1 - SEL$2
+   2 - SEL$1 / DATA@SEL$2
+   3 - SEL$1
+   4 - SEL$1 / TMAIN@SEL$1
+
+Column Projection Information (identified by operation id):
+-----------------------------------------------------------
+
+   1 - (#keys=0) MAX("PREVIOUS_ID")[22], MIN("ID")[22]
+   2 - "ID"[NUMBER,22], "PREVIOUS_ID"[NUMBER,22]
+   3 - (#keys=1) "ID"[NUMBER,22], "TMAIN".ROWID[ROWID,10], COUNT(*) OVER ( ORDER BY "ID" ROWS  BETWEEN 1 PRECEDING  AND 1 PRECEDING )[22], FIRST_VALUE("ID") OVER (
+       ORDER BY "ID" ROWS  BETWEEN 1 PRECEDING  AND 1 PRECEDING )[22]
+   4 - "TMAIN".ROWID[ROWID,10], "ID"[NUMBER,22]
+
+
+35 rows selected.
+
+Elapsed: 00:00:00.75
+SQL> input files:
+	'-'
+
+where expression:
+	((1) and ($dep==$depmin)) and ($nam=~/(?^:(?i).+)/)
+
+group expression:
+	$nam
+
+matched call names:
+	'CLOSE'
+	'CSS initialization'
+	'CSS operation: action'
+	'CSS operation: query'
+	'Disk file operations I/O'
+	'EXEC'
+	'FETCH'
+	'PARSE'
+	'PGA memory operation'
+	'SQL*Net message from client'
+	'SQL*Net message to client'
+	'acknowledge over PGA limit'
+	'db file sequential read'
+	'direct path read temp'
+	'direct path write temp'
+	'gc cr grant 2-way'
+
+CALL-NAME                    DURATION       %  CALLS      MEAN       MIN       MAX
+---------------------------  --------  ------  -----  --------  --------  --------
+acknowledge over PGA limit   3.430707   39.0%    332  0.010333  0.008627  0.054902
+direct path write temp       2.152878   24.5%     34  0.063320  0.006888  0.192979
+FETCH                        1.619000   18.4%      2  0.809500  0.000000  1.619000
+db file sequential read      0.925042   10.5%  2,251  0.000411  0.000000  0.058956
+gc cr grant 2-way            0.346540    3.9%  1,157  0.000300  0.000000  0.008537
+direct path read temp        0.286816    3.3%    116  0.002473  0.000185  0.021451
+PARSE                        0.016000    0.2%      2  0.008000  0.000000  0.016000
+PGA memory operation         0.011928    0.1%    680  0.000018  0.000000  0.000794
+CSS initialization           0.004150    0.0%      2  0.002075  0.000019  0.004131
+SQL*Net message from client  0.004128    0.0%      3  0.001376  0.000385  0.002132
+CSS operation: action        0.001291    0.0%      2  0.000646  0.000520  0.000771
+CSS operation: query         0.000456    0.0%      6  0.000076  0.000000  0.000449
+Disk file operations I/O     0.000003    0.0%      1  0.000003  0.000003  0.000003
+SQL*Net message to client    0.000002    0.0%      3  0.000001  0.000000  0.000001
+CLOSE                        0.000000    0.0%      2  0.000000  0.000000  0.000000
+EXEC                         0.000000    0.0%      2  0.000000  0.000000  0.000000
+---------------------------  --------  ------  -----  --------  --------  --------
+TOTAL (16)                   8.798941  100.0%  4,595  0.001915  0.000000  1.619000
+
+SQL> SQL> SQL> Disconnected from Oracle Database 12c Enterprise Edition Release 12.2.0.1.0 - 64bit Production
